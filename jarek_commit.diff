@@ -1,0 +1,32 @@
+diff --git a/get_authors.rb b/get_authors.rb
+index 35bab8f..9eb5b62 100755
+--- a/get_authors.rb
++++ b/get_authors.rb
+@@ -40,7 +40,7 @@ end
+ 
+ module Markdown
+   def self.mailto(a, e)
+-    "[#{a}](mailto:#{e})"
++    "[#{a}](mailto:{{ '#{e}' | encode_email }})"
+   end
+ 
+   def self.center(text)
+diff --git a/test/get_authors_test.rb b/test/get_authors_test.rb
+index 40ea071..4351141 100644
+--- a/test/get_authors_test.rb
++++ b/test/get_authors_test.rb
+@@ -35,12 +35,12 @@ class TestGetAuthors < Minitest::Test
+     `#{@original_dir}/get_authors.rb`
+ 
+     content = File.read(File.join @subdir, 'README.md')
+-    assert_match %Q|\n{:center: style=\"text-align: center\"}\nAuthors: [Your Name](mailto:you@example.com)\n{:center}|, content
++    assert_match %Q<\n{:center: style=\"text-align: center\"}\nAuthors: [Your Name](mailto:{{ 'you@example.com' | encode_email }})\n{:center}>, content
+   end
+ 
+   def test_markdown_mailto
+     author, email = "Your Name", "you@example.com"
+-    assert_match "[#{author}](mailto:#{email})", Markdown.mailto(author, email)
++    assert_match "[#{author}](mailto:{{ '#{email}' | encode_email }})", Markdown.mailto(author, email)
+   end
+ 
+   def test_markdown_center

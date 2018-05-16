@@ -3,6 +3,12 @@ require "fileutils"
 
 require_relative "../get_authors.rb"
 
+module Git
+  def self.init
+    `git init`
+  end
+end
+
 class TestGetAuthors < Minitest::Test
   def setup
     @original_dir = Dir.pwd
@@ -17,7 +23,7 @@ class TestGetAuthors < Minitest::Test
     Dir.chdir @dir
 
 
-    `git init`
+    Git.init
 
     `git config user.email "you@example.com"`
     `git config user.name "Your Name"`
@@ -35,12 +41,12 @@ class TestGetAuthors < Minitest::Test
     `#{@original_dir}/get_authors.rb`
 
     content = File.read(File.join @subdir, 'README.md')
-    assert_match %Q|\n{:center: style=\"text-align: center\"}\nAuthors: [Your Name](mailto:you@example.com)\n{:center}|, content
+    assert_match %Q<\n{:center: style=\"text-align: center\"}\nAuthors: [Your Name](mailto:{{ 'you@example.com' | encode_email }})\n{:center}>, content
   end
 
   def test_markdown_mailto
     author, email = "Your Name", "you@example.com"
-    assert_match "[#{author}](mailto:#{email})", Markdown.mailto(author, email)
+    assert_match "[#{author}](mailto:{{ '#{email}' | encode_email }})", Markdown.mailto(author, email)
   end
 
   def test_markdown_center

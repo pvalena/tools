@@ -30,6 +30,10 @@ module Git
     end
   end
 
+  def self.git (command)
+    `git #{command}`
+  end
+
   # Create instance of Git::Log and pass it output from git log command
   # return 5 last authors of a particular file
   # %an returns author, semicolon for effortless parsing, %ae return email of author
@@ -40,7 +44,7 @@ end
 
 module Markdown
   def self.mailto(a, e)
-    "[#{a}](mailto:#{e})"
+    "[#{a}](mailto:{{ '#{e}' | encode_email }})"
   end
 
   def self.center(text)
